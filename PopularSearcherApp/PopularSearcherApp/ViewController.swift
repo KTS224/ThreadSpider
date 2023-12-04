@@ -15,12 +15,16 @@ struct NateModel {
 }
 
 class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSource {
+    @IBOutlet var lblUpToDate: UILabel!
     @IBOutlet var imgView: UIImageView!
     
     @IBOutlet var btnStart: UIButton!
     let cellIdentifier = "MyCell"
     var myData = ["사과", "당근", "카카오", "샐러드","사과", "당근", "카카오", "샐러드","사과", "당근"]
     var nateSearches: [NateModel] = []
+    
+//    let interval = 1.0
+//    var count = 0
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return myData.count
@@ -49,6 +53,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
 
                 myData[i] = nateSearches[i].word.replacingOccurrences(of: "\"", with: "")
             }
+            updateTime()
         }
         
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
@@ -62,10 +67,30 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
     
     override func viewDidLoad() {
         super.viewDidLoad()
+//        Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(self.updateTime), userInfo: nil, repeats: true)
         myTableView.delegate = self
         myTableView.dataSource = self
         self.imgView.image = UIImage(named: "imgNate")
         // Do any additional setup after loading the view.
+    }
+    
+//    @objc func updateTime() {
+//        let date = Date()
+//        let formatter = DateFormatter()
+//        
+//        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss EEE"
+//        
+//        lblUpToDate.text = "갱신 시간: " + formatter.string(from: date)
+//        self.count += 1
+//    }
+    
+    func updateTime() {
+        let date = Date()
+        let formatter = DateFormatter()
+        
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss EEE"
+        
+        lblUpToDate.text = "갱신 시간: " + formatter.string(from: date)
     }
 
     func fetchHTMLParsingFromNate(completion: @escaping () -> ()) {
@@ -87,7 +112,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
                     let b = try doc.select("body").first()!.text()
                     print(b, terminator: "\n")
                     
-                    var arr = b.split(separator: "]")
+                    let arr = b.split(separator: "]")
                     for i in 0..<arr.count {
                         let word = arr[i].split(separator: ",")[1]
                         print(word)
