@@ -14,8 +14,6 @@ struct NateModel {
     var word: String
 }
 
-// TODO: 피커 뷰에서 바꿀때 검색어는 바뀌지 않는 부분 수정하기
-
 class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource {
     
     // MARK: - 피커 뷰
@@ -39,6 +37,21 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         pickedSite = pickerViewItems[row]
         imgView.image = UIImage(named: "img" + pickerViewItems[row])
+        
+        if pickedSite == "Nate" {
+            for i in 0..<self.nateSearches.count {
+
+                myData[i] = nateSearches[i].word.replacingOccurrences(of: "\"", with: "")
+            }
+        } else if pickedSite == "Zum" {
+            for i in 0..<self.zumSearches.count {
+
+                myData[i] = zumSearches[i].word
+            }
+        }
+        
+        
+        self.myTableView.reloadData()
         print(pickedSite)
     }
     
@@ -49,7 +62,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
     @IBOutlet var pickerSite: UIPickerView!
     @IBOutlet var btnStart: UIButton!
     let cellIdentifier = "MyCell"
-    var myData = ["사과", "당근", "카카오", "샐러드","사과", "당근", "카카오", "샐러드","사과", "당근"]
+    var myData = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
     var nateSearches: [NateModel] = []
     var zumSearches: [NateModel] = []
     
