@@ -14,6 +14,11 @@ struct NateModel {
     var word: String
 }
 
+// TODO: 갱신중일때 버튼 비활성화 하기
+// TODO: 피커뷰 항목(네이트, 줌)에 따라 버튼 색상 변경하기
+// TODO: 줌, 네이트 사이트별 웹뷰 구분하기
+// TODO: 테이블 뷰 내부에 순위 구현하기
+
 class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource {
     
     // MARK: - 피커 뷰
@@ -105,6 +110,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
 
                     myData[i] = nateSearches[i].word.replacingOccurrences(of: "\"", with: "")
                 }
+                lblUpToDate.text = "----갱신중----"
             }
             
         } else if pickedSite == "Zum" {
@@ -115,13 +121,15 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
 
                     myData[i] = zumSearches[i].word
                 }
+                lblUpToDate.text = "----갱신중----"
             }
         }
-        
+        lblUpToDate.text = "--갱신중--"
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) { [self] in
           // 1초 후 실행될 부분
             self.myTableView.reloadData()
             print(self.myData)
+            lblUpToDate.text = "------갱신중------"
             updateTime()
         }
     }
@@ -130,7 +138,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
         let date = Date()
         let formatter = DateFormatter()
         
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss EEE"
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
         lblUpToDate.text = "갱신 시간: " + formatter.string(from: date)
     }
