@@ -14,15 +14,40 @@ struct NateModel {
     var word: String
 }
 
-class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource {
+    
+    let ArrayNumber = 2
+    let pickerViewColumn = 1
+    let pickerViewItems = ["Nate", "Zum"]
+    var pickedSite = "Nate"
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return pickerViewColumn
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return pickerViewItems.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return pickerViewItems[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        pickedSite = pickerViewItems[row]
+        imgView.image = UIImage(named: "img" + pickerViewItems[row])
+        print(pickedSite)
+    }
+    
     @IBOutlet var lblUpToDate: UILabel!
     @IBOutlet var imgView: UIImageView!
     
+    @IBOutlet var pickerSite: UIPickerView!
     @IBOutlet var btnStart: UIButton!
     let cellIdentifier = "MyCell"
     var myData = ["사과", "당근", "카카오", "샐러드","사과", "당근", "카카오", "샐러드","사과", "당근"]
     var nateSearches: [NateModel] = []
-    
+    var zumSearches: [NateModel] = []
 //    let interval = 1.0
 //    var count = 0
 
@@ -45,17 +70,31 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
         }
     }
     
+    // MARK: nate일때와 zum일때 서치 구분하기
     @IBAction func startSearch(_ sender: UIButton) {
-        fetchHTMLParsingFromNate{}
+        if pickedSite == "Nate" {
+            fetchHTMLParsingFromNate {}
 
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [self] in
-            for i in 0..<self.nateSearches.count {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [self] in
+                for i in 0..<self.nateSearches.count {
 
-                myData[i] = nateSearches[i].word.replacingOccurrences(of: "\"", with: "")
+                    myData[i] = nateSearches[i].word.replacingOccurrences(of: "\"", with: "")
+                }
             }
-            updateTime()
+            
+        } else if pickedSite == "Zum" {
+            fetchHTMLParsingFromZum {}
+            
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) { [self] in
+                for i in 0..<self.zumSearches.count {
+
+                    myData[i] = zumSearches[i].word
+                }
+            }
         }
         
+        
+        updateTime()
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
           // 1초 후 실행될 부분
             self.myTableView.reloadData()
@@ -72,6 +111,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
         myTableView.dataSource = self
         self.imgView.image = UIImage(named: "imgNate")
         // Do any additional setup after loading the view.
+        pickerSite.delegate = self
     }
     
 //    @objc func updateTime() {
@@ -129,6 +169,42 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
 
         task.resume()
         
+    }
+    
+    func fetchHTMLParsingFromZum(completion: @escaping () -> ()) {
+        zumSearches.removeAll()
+        let urlAddress = "https://m.search.zum.com/search.zum?method=uni&option=accu&qm=f_typing.top&query="
+        guard let url = URL(string: urlAddress) else { return }
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("ERROR: ", error)
+                completion()
+                return
+            }
+
+            if let data = data, let html = String(data: data, encoding: .utf8) {
+                do {
+                    let doc: Document = try SwiftSoup.parse(html)
+                    let b = try doc.select("body").first()!.select("span.keyword")
+                    
+                    for i in b {
+                        print(try i.text())
+                        self.zumSearches.append(NateModel.init(number: 0, word: try i.text()))
+                    }
+                    
+                    if self.zumSearches.count > 10 {
+                        self.zumSearches.removeLast()
+                    }
+                } catch let error {
+                    print("ERROR: ", error)
+                }
+            }
+
+            completion()
+        }
+
+        task.resume()
     }
 }
 

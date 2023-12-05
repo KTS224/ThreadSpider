@@ -17,7 +17,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4CU-KV-h5r">
-                                <rect key="frame" x="0.0" y="695" width="393" height="52"/>
+                                <rect key="frame" x="0.0" y="662" width="393" height="85"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             </pickerView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Sw-ed-5Yl">
@@ -68,6 +68,7 @@
                         <outlet property="imgView" destination="Mbw-nS-Nng" id="o5D-sT-gBg"/>
                         <outlet property="lblUpToDate" destination="nOX-Ri-vBw" id="B3c-oV-s1r"/>
                         <outlet property="myTableView" destination="0xn-cy-v5k" id="RUl-GG-aPs"/>
+                        <outlet property="pickerSite" destination="4CU-KV-h5r" id="oJ3-CX-40s"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
