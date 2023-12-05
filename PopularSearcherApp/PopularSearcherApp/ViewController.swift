@@ -14,8 +14,11 @@ struct NateModel {
     var word: String
 }
 
+// TODO: 피커 뷰에서 바꿀때 검색어는 바뀌지 않는 부분 수정하기
+
 class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource {
     
+    // MARK: - 피커 뷰
     let ArrayNumber = 2
     let pickerViewColumn = 1
     let pickerViewItems = ["Nate", "Zum"]
@@ -39,18 +42,17 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
         print(pickedSite)
     }
     
+    // MARK: - 테이블 뷰
     @IBOutlet var lblUpToDate: UILabel!
     @IBOutlet var imgView: UIImageView!
-    
+    @IBOutlet var myTableView: UITableView!
     @IBOutlet var pickerSite: UIPickerView!
     @IBOutlet var btnStart: UIButton!
     let cellIdentifier = "MyCell"
     var myData = ["사과", "당근", "카카오", "샐러드","사과", "당근", "카카오", "샐러드","사과", "당근"]
     var nateSearches: [NateModel] = []
     var zumSearches: [NateModel] = []
-//    let interval = 1.0
-//    var count = 0
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return myData.count
     }
@@ -61,6 +63,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
         return cell
     }
     
+    // 테이블뷰 -> 모달뷰컨트롤러 넘겨주는 것들
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "sgDetail" {
             let cell = sender as! UITableViewCell
@@ -68,6 +71,15 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
             let detailView = segue.destination as! ModalViewController
             detailView.selectedWord(myData[((indexPath! as NSIndexPath).row)])
         }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        myTableView.delegate = self
+        myTableView.dataSource = self
+        self.imgView.image = UIImage(named: "imgNate")
+        // Do any additional setup after loading the view.
+        pickerSite.delegate = self
     }
     
     // MARK: nate일때와 zum일때 서치 구분하기
@@ -93,36 +105,13 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
             }
         }
         
-        
-        updateTime()
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) { [self] in
           // 1초 후 실행될 부분
             self.myTableView.reloadData()
             print(self.myData)
+            updateTime()
         }
     }
-    
-    @IBOutlet var myTableView: UITableView!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-//        Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(self.updateTime), userInfo: nil, repeats: true)
-        myTableView.delegate = self
-        myTableView.dataSource = self
-        self.imgView.image = UIImage(named: "imgNate")
-        // Do any additional setup after loading the view.
-        pickerSite.delegate = self
-    }
-    
-//    @objc func updateTime() {
-//        let date = Date()
-//        let formatter = DateFormatter()
-//        
-//        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss EEE"
-//        
-//        lblUpToDate.text = "갱신 시간: " + formatter.string(from: date)
-//        self.count += 1
-//    }
     
     func updateTime() {
         let date = Date()
@@ -209,7 +198,7 @@ class ViewController: UIViewController,UITableViewDelegate, UITableViewDataSourc
 }
 
 
-
+// MARK: - eucKr 인코딩
 extension String.Encoding {
     static let eucKrDecode = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(0x0422))
 }
